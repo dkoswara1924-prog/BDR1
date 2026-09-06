@@ -3,121 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absen BDR IV A - SDN Purwaraja 1</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #eef2f5;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    .header {
-      text-align: center;
-      background: #4A90E2;
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-      color: #333;
-      display: block;
-      margin-top: 15px;
-    }
-    select, input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-    button {
-      background-color: #2ECC71;
-      color: white;
-      font-weight: bold;
-      border: none;
-      margin-top: 20px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    button:hover {
-      background-color: #27AE60;
-    }
-  </style>
+  <title>Absen Kelas IV A - SDN Purwaraja</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>🏫 Absensi Kelas IV A</h1>
+      <h2>SDN Purwaraja Menes Pandeglang</h2>
+    </header>
 
-<div class="card">
-  <div class="header">
-    <h2 style="margin:0;">Absen BDR Kelas IV A</h2>
-    <p style="margin:5px 0 0 0; font-size:12px;">SDN Purwaraja 1 Menes</p>
+    <!-- Form Input Harian -->
+    <section class="card">
+      <h3>📝 Input Absen & Tugas Harian</h3>
+      <form id="absenForm">
+        <div class="form-group">
+          <label for="tanggal">Hari & Tanggal:</label>
+          <input type="date" id="tanggal" required>
+        </div>
+
+        <div class="form-group">
+          <label for="nama">Nama Siswa:</label>
+          <input type="text" id="nama" placeholder="Masukkan nama siswa" required>
+        </div>
+
+        <div class="form-group">
+          <label for="kehadiran">Status Kehadiran:</label>
+          <select id="kehadiran">
+            <option value="Hadir">🟢 Hadir</option>
+            <option value="Izin">🟡 Izin</option>
+            <option value="Sakit">🔵 Sakit</option>
+            <option value="Alpa">🔴 Alpa</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="mapel">Mata Pelajaran / Tugas:</label>
+          <input type="text" id="mapel" placeholder="Contoh: Matematika PR Hal 12">
+        </div>
+
+        <div class="form-group">
+          <label for="statusTugas">Status Tugas:</label>
+          <select id="statusTugas">
+            <option value="Sudah">✅ Sudah Mengumpulkan</option>
+            <option value="Belum">❌ Belum Mengumpulkan</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="linkTugas">Link Tugas (Drive/File):</label>
+          <input type="url" id="linkTugas" placeholder="https://drive.google.com/...">
+        </div>
+
+        <button type="submit" class="btn-primary">Simpan Data</button>
+      </form>
+    </section>
+
+    <!-- Tabel Catatan Harian -->
+    <section class="card">
+      <h3>📋 Catatan Absen Hari Ini</h3>
+      <div class="table-wrapper">
+        <table id="tabelHarian">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Nama</th>
+              <th>Kehadiran</th>
+              <th>Mapel/Tugas</th>
+              <th>Status Tugas</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab Rekapitulasi -->
+    <section class="card">
+      <h3>📊 Rekapitulasi Kehadiran & Tugas</h3>
+      <div class="table-wrapper">
+        <table id="tabelRekap">
+          <thead>
+            <tr>
+              <th>Nama Siswa</th>
+              <th>Hadir</th>
+              <th>Izin</th>
+              <th>Sakit</th>
+              <th>Alpa</th>
+              <th>Tugas Selesai</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
-  <form id="absenForm">
-    <label for="hari">Hari / Tanggal:</label>
-    <select id="hari" required>
-      <option value="">-- Pilih Hari --</option>
-      <option value="Senin">Senin</option>
-      <option value="Selasa">Selasa</option>
-      <option value="Rabu">Rabu</option>
-    </select>
-
-    <label for="nama">Nama Siswa:</label>
-    <select id="nama" required>
-      <option value="">-- Pilih Nama Kamu --</option>
-      <!-- Masukkan daftar nama siswa Kelas IV A di sini -->
-      <option value="Ahmad">Ahmad</option>
-      <option value="Budi">Budi</option>
-      <option value="Siti">Siti</option>
-    </select>
-
-    <label for="status">Keterangan:</label>
-    <select id="status" required>
-      <option value="Hadir Siap Belajar">Hadir & Siap Belajar</option>
-      <option value="Sakit">Sakit</option>
-      <option value="Izin">Izin</option>
-    </select>
-
-    <button type="button" onclick="kirimAbsen()">Kirim Absen via WhatsApp</button>
-  </form>
-</div>
-
-<script>
-function kirimAbsen() {
-  var hari = document.getElementById('hari').value;
-  var nama = document.getElementById('nama').value;
-  var status = document.getElementById('status').value;
-  
-  if(!hari || !nama) {
-    alert("Silakan lengkapi data absensi terlebih dahulu!");
-    return;
-  }
-
-  // Nomor WhatsApp Guru (Ganti dengan nomor tujuan/grup)
-  var nomorWA = "628xxxxxxxxxx"; 
-  
-  var pesan = "Halo Bu/Pak Guru, berikut absen BDR saya:%0A" +
-              "*Hari:* " + hari + "%0A" +
-              "*Nama:* " + nama + "%0A" +
-              "*Kelas:* IV A SDN Purwaraja 1%0A" +
-              "*Status:* " + status;
-
-  window.open("https://wa.me/" + nomorWA + "?text=" + pesan, '_blank');
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
