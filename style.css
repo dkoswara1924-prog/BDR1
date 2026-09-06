@@ -1,1 +1,105 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif, Arial;
+}
 
+body {
+  background-color: #f0f8ff;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  background: #ff7f50;
+  color: white;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+header h1 { margin: 0; font-size: 1.8rem; }
+header h2 { margin: 5px 0 0 0; font-size: 1.1rem; font-weight: normal; }
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+h3 {
+  color: #2e8b57;
+  margin-top: 0;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #add8e6;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #ff7f50;
+}
+
+.btn-primary {
+  background-color: #3cb371;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2e8b57;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #ffe4b5;
+  color: #333;
+}
+
+tr:nth-child(even) { background-color: #f9f9f9; }
