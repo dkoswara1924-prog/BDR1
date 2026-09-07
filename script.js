@@ -42,7 +42,7 @@ const daftarSiswa = [
   "Zulfan Azhar Raihan"
 ];
 
-// Muat daftar siswa ke dalam Dropdown Select
+// Muat daftar siswa ke Dropdown
 const selectNama = document.getElementById('nama');
 daftarSiswa.forEach(siswa => {
   const option = document.createElement('option');
@@ -61,13 +61,28 @@ document.getElementById('tanggal').valueAsDate = new Date();
 document.getElementById('absenForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
+  const fileInput = document.getElementById('fotoTugas');
+  const file = fileInput.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      simpanData(evt.target.result);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    simpanData('');
+  }
+});
+
+function simpanData(fotoBase64) {
   const dataBaru = {
     tanggal: document.getElementById('tanggal').value,
     nama: selectNama.value,
     kehadiran: document.getElementById('kehadiran').value,
     mapel: document.getElementById('mapel').value || '-',
     statusTugas: document.getElementById('statusTugas').value,
-    linkTugas: document.getElementById('linkTugas').value || '#'
+    fotoTugas: fotoBase64
   };
 
   dataAbsen.push(dataBaru);
@@ -76,10 +91,10 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
   // Reset Input
   selectNama.value = '';
   document.getElementById('mapel').value = '';
-  document.getElementById('linkTugas').value = '';
+  document.getElementById('fotoTugas').value = '';
 
   renderTabel();
-});
+}
 
 // Fungsi Render Tabel Harian dan Rekapitulasi
 function renderTabel() {
@@ -89,31 +104,28 @@ function renderTabel() {
   tbodyHarian.innerHTML = '';
   tbodyRekap.innerHTML = '';
 
-  // Inisialisasi Rekapitulasi untuk semua siswa
   const rekap = {};
   daftarSiswa.forEach(nama => {
     rekap[nama] = { Hadir: 0, Izin: 0, Sakit: 0, Alpa: 0, TugasSelesai: 0 };
   });
 
-  // Isi Data Harian & Hitung Rekap
   dataAbsen.forEach(item => {
-    // Tabel Harian
-    const row = document.createElement('tr');
-    const linkHTML = item.linkTugas !== '#' 
-      ? `<a href="${item.linkTugas}" target="_blank">🔗 Buka Link</a>` 
+    // Tampilan Gambar di Tabel
+    const fotoHTML = item.fotoTugas 
+      ? `<a href="${item.fotoTugas}" target="_blank"><img src="${item.fotoTugas}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;"></a>` 
       : '-';
 
+    const row = document.createElement('tr');
     row.innerHTML = `
       <td>${item.tanggal}</td>
       <td><strong>${item.nama}</strong></td>
       <td>${item.kehadiran}</td>
       <td>${item.mapel}</td>
-      <td>${item.statusTugas === 'Sudah' ? '✅ Sudah' : '❌ Belum'}</td>
-      <td>${linkHTML}</td>
+      <td>${item.statusTugas === 'Sudah' ? '✅ Sudah Mengerjakan' : '❌ Belum Mengerjakan'}</td>
+      <td>${fotoHTML}</td>
     `;
     tbodyHarian.prepend(row);
 
-    // Update Rekap jika siswa terdaftar
     if (rekap[item.nama]) {
       rekap[item.nama][item.kehadiran]++;
       if (item.statusTugas === 'Sudah') {
@@ -122,7 +134,6 @@ function renderTabel() {
     }
   });
 
-  // Render Tabel Rekapitulasi
   daftarSiswa.forEach(nama => {
     const row = document.createElement('tr');
     row.innerHTML = `
