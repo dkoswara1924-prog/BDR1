@@ -52,7 +52,7 @@ daftarSiswa.forEach(siswa => {
 });
 
 // Ambil Data dari LocalStorage
-const dataAbsen = JSON.parse(localStorage.getItem('dataAbsenKelas4A')) || [];
+let dataAbsen = JSON.parse(localStorage.getItem('dataAbsenKelas4A')) || [];
 
 // Set Tanggal Hari Ini secara otomatis
 document.getElementById('tanggal').valueAsDate = new Date();
@@ -65,9 +65,26 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
   const file = fileInput.files[0];
 
   if (file) {
+    // Kompresi Gambar
     const reader = new FileReader();
-    reader.onload = function(evt) {
-      simpanData(evt.target.result);
+    reader.onload = function(event) {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 400; // Ukuran lebar diturunkan agar hemat memori
+        const scaleFactor = MAX_WIDTH / img.width;
+        
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleFactor;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Kompresi kualitas gambar ke 60%
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        simpanData(compressedBase64);
+      };
     };
     reader.readAsDataURL(file);
   } else {
@@ -85,15 +102,20 @@ function simpanData(fotoBase64) {
     fotoTugas: fotoBase64
   };
 
-  dataAbsen.push(dataBaru);
-  localStorage.setItem('dataAbsenKelas4A', JSON.stringify(dataAbsen));
+  try {
+    dataAbsen.push(dataBaru);
+    localStorage.setItem('dataAbsenKelas4A', JSON.stringify(dataAbsen));
+    
+    // Reset Input
+    selectNama.value = '';
+    document.getElementById('mapel').value = '';
+    document.getElementById('fotoTugas').value = '';
 
-  // Reset Input
-  selectNama.value = '';
-  document.getElementById('mapel').value = '';
-  document.getElementById('fotoTugas').value = '';
-
-  renderTabel();
+    renderTabel();
+    alert('Data berhasil disimpan!');
+  } catch (error) {
+    alert('Memori penyimpanan penuh. Coba simpan tanpa foto atau hapus riwayat browser.');
+  }
 }
 
 // Fungsi Render Tabel Harian dan Rekapitulasi
