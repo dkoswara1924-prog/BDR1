@@ -1,3 +1,5 @@
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZISCNCaXbw/exec';
+
 // Daftar Nama Siswa Kelas IV A
 const daftarSiswa = [
   "Ahmad Abdul Fatih Najmuddin",
@@ -51,9 +53,6 @@ daftarSiswa.forEach(siswa => {
   selectNama.appendChild(option);
 });
 
-// Ambil Data dari LocalStorage
-let dataAbsen = JSON.parse(localStorage.getItem('dataAbsenKelas4A')) || [];
-
 // Set Tanggal Hari Ini secara otomatis
 document.getElementById('tanggal').valueAsDate = new Date();
 
@@ -63,16 +62,19 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
 
   const fileInput = document.getElementById('fotoTugas');
   const file = fileInput.files[0];
+  const btnSubmit = e.target.querySelector('button[type="submit"]');
+  
+  btnSubmit.disabled = true;
+  btnSubmit.textContent = '⏳ Mengirim Data...';
 
   if (file) {
-    // Fungsi Kompresi Foto
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
       img.src = event.target.result;
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 300; // Ukuran lebar diturunkan agar sangat ringan
+        const MAX_WIDTH = 300;
         const scaleFactor = MAX_WIDTH / img.width;
         
         canvas.width = MAX_WIDTH;
@@ -81,19 +83,18 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // Kompresi kualitas gambar ke 50%
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
-        simpanData(compressedBase64);
+        kirimKeGoogleSheets(compressedBase64, btnSubmit);
       };
     };
     reader.readAsDataURL(file);
   } else {
-    simpanData('');
+    kirimKeGoogleSheets('', btnSubmit);
   }
 });
 
-function simpanData(fotoBase64) {
-  const dataBaru = {
+function kirimKeGoogleSheets(fotoBase64, btnSubmit) {
+  const payload = {
     tanggal: document.getElementById('tanggal').value,
     nama: selectNama.value,
     kehadiran: document.getElementById('kehadiran').value,
@@ -102,24 +103,39 @@ function simpanData(fotoBase64) {
     fotoTugas: fotoBase64
   };
 
-  try {
-    dataAbsen.push(dataBaru);
-    localStorage.setItem('dataAbsenKelas4A', JSON.stringify(dataAbsen));
-    
-    // Reset Input
+  fetch(URL_SCRIPT, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert('✅ Data dan Foto Berhasil Terkirim!');
     selectNama.value = '';
     document.getElementById('mapel').value = '';
     document.getElementById('fotoTugas').value = '';
-
-    renderTabel();
-    alert('✅ Data dan Foto Berhasil Disimpan!');
-  } catch (error) {
-    alert('⚠️ Penyimpanan browser penuh! Silakan hapus riwayat browser atau gunakan foto yang lebih kecil.');
-  }
+    
+    // Refresh tabel rekapitulasi
+    ambilDataGoogleSheets();
+  })
+  .catch(err => {
+    alert('❌ Gagal mengirim data. Coba cek koneksi internetmu.');
+  })
+  .finally(() => {
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = 'Simpan Data';
+  });
 }
 
-// Fungsi Render Tabel Harian dan Rekapitulasi
-function renderTabel() {
+function ambilDataGoogleSheets() {
+  fetch(URL_SCRIPT)
+    .then(res => res.json())
+    .then(data => {
+      renderTabel(data);
+    })
+    .catch(err => console.error("Gagal memuat data rekap:", err));
+}
+
+function renderTabel(dataAbsen) {
   const tbodyHarian = document.querySelector('#tabelHarian tbody');
   const tbodyRekap = document.querySelector('#tabelRekap tbody');
 
@@ -131,27 +147,28 @@ function renderTabel() {
     rekap[nama] = { Hadir: 0, Izin: 0, Sakit: 0, Alpa: 0, TugasSelesai: 0 };
   });
 
-  dataAbsen.forEach(item => {
-    // Tampilan Gambar di Tabel
-    const fotoHTML = item.fotoTugas 
-      ? `<a href="${item.fotoTugas}" target="_blank"><img src="${item.fotoTugas}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ccc;"></a>` 
+  dataAbsen.forEach(rowArray => {
+    const [tanggal, nama, kehadiran, mapel, statusTugas, fotoTugas] = rowArray;
+
+    const fotoHTML = fotoTugas 
+      ? `<a href="${fotoTugas}" target="_blank"><img src="${fotoTugas}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ccc;"></a>` 
       : '-';
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${item.tanggal}</td>
-      <td><strong>${item.nama}</strong></td>
-      <td>${item.kehadiran}</td>
-      <td>${item.mapel}</td>
-      <td>${item.statusTugas === 'Sudah' ? '✅ Sudah Mengerjakan' : '❌ Belum Mengerjakan'}</td>
+      <td>${tanggal}</td>
+      <td><strong>${nama}</strong></td>
+      <td>${kehadiran}</td>
+      <td>${mapel}</td>
+      <td>${statusTugas === 'Sudah' ? '✅ Sudah Mengerjakan' : '❌ Belum Mengerjakan'}</td>
       <td>${fotoHTML}</td>
     `;
     tbodyHarian.prepend(row);
 
-    if (rekap[item.nama]) {
-      rekap[item.nama][item.kehadiran]++;
-      if (item.statusTugas === 'Sudah') {
-        rekap[item.nama].TugasSelesai++;
+    if (rekap[nama]) {
+      rekap[nama][kehadiran]++;
+      if (statusTugas === 'Sudah') {
+        rekap[nama].TugasSelesai++;
       }
     }
   });
@@ -170,4 +187,5 @@ function renderTabel() {
   });
 }
 
-renderTabel();
+// Muat data saat halaman pertama kali dibuka
+ambilDataGoogleSheets();
