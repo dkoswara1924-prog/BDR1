@@ -4,7 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Absensiku - Kelas IV A SDN Purwaraja</title>
-  <link rel="stylesheet" href="./style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif, Arial;
+    }
+
+    body {
+      background-color: #eef7fe;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      background: #ff7f50;
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    header h1 { margin: 0; font-size: 1.8rem; }
+    header h2 { margin: 5px 0 0 0; font-size: 1.1rem; font-weight: normal; }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #2e8b57;
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #add8e6;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff7f50;
+    }
+
+    .btn-primary {
+      background-color: #3cb371;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: #2e8b57;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #ffe4b5;
+      color: #333;
+    }
+
+    tr:nth-child(even) { background-color: #f9f9f9; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -47,14 +153,14 @@
         <div class="form-group">
           <label for="statusTugas">Status Tugas:</label>
           <select id="statusTugas">
-            <option value="Sudah">✅ Sudah Mengumpulkan</option>
-            <option value="Belum">❌ Belum Mengumpulkan</option>
+            <option value="Sudah">✅ Sudah Mengerjakan</option>
+            <option value="Belum">❌ Belum Mengerjakan</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="linkTugas">Link Tugas (Drive/File):</label>
-          <input type="url" id="linkTugas" placeholder="https://drive.google.com/...">
+          <label for="fotoTugas">📸 Unggah Bukti Foto Tugas:</label>
+          <input type="file" id="fotoTugas" accept="image/*" capture="environment">
         </div>
 
         <button type="submit" class="btn-primary">Simpan Data</button>
@@ -73,7 +179,7 @@
               <th>Kehadiran</th>
               <th>Mapel/Tugas</th>
               <th>Status Tugas</th>
-              <th>Link</th>
+              <th>Foto Bukti</th>
             </tr>
           </thead>
           <tbody></tbody>
