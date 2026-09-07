@@ -1,4 +1,4 @@
-const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZISCNCaXbw/exec';
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZlSCNCaXbw/exec';
 
 // Daftar Nama Siswa Kelas IV A
 const daftarSiswa = [
@@ -62,7 +62,7 @@ if (inputTanggal) {
   inputTanggal.valueAsDate = new Date();
 }
 
-// Tampilkan nama-nama siswa di tabel rekap awal (sebelum ambil data dari Sheets)
+// Render tabel rekap awal
 renderTabel([]);
 
 // Handle Form Submit
@@ -83,7 +83,7 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
       img.src = event.target.result;
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 300;
+        const MAX_WIDTH = 250; // Kompresi ekstra agar sangat ringan
         const scaleFactor = MAX_WIDTH / img.width;
         
         canvas.width = MAX_WIDTH;
@@ -92,7 +92,8 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+        // Kompresi kualitas gambar ke 40%
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
         kirimKeGoogleSheets(compressedBase64, btnSubmit);
       };
     };
@@ -103,7 +104,7 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
 });
 
 function kirimKeGoogleSheets(fotoBase64, btnSubmit) {
-  const formData = new URLSearchParams();
+  const formData = new FormData();
   formData.append('tanggal', document.getElementById('tanggal').value);
   formData.append('nama', selectNama.value);
   formData.append('kehadiran', document.getElementById('kehadiran').value);
@@ -113,11 +114,7 @@ function kirimKeGoogleSheets(fotoBase64, btnSubmit) {
 
   fetch(URL_SCRIPT, {
     method: 'POST',
-    mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: formData.toString()
+    body: formData
   })
   .then(() => {
     alert('✅ Data dan Foto Berhasil Terkirim!');
@@ -125,7 +122,7 @@ function kirimKeGoogleSheets(fotoBase64, btnSubmit) {
     document.getElementById('mapel').value = '';
     document.getElementById('fotoTugas').value = '';
     
-    setTimeout(ambilDataGoogleSheets, 1500);
+    setTimeout(ambilDataGoogleSheets, 2000);
   })
   .catch(err => {
     alert('❌ Gagal mengirim data. Coba cek koneksi internetmu.');
@@ -165,8 +162,8 @@ function renderTabel(dataAbsen) {
         const [tanggal, nama, kehadiran, mapel, statusTugas, fotoTugas] = rowArray;
 
         if (tbodyHarian) {
-          const fotoHTML = fotoTugas 
-            ? `<a href="${fotoTugas}" target="_blank"><img src="${fotoTugas}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ccc;"></a>` 
+          const fotoHTML = (fotoTugas && fotoTugas.length > 20) 
+            ? `<a href="${fotoTugas}" target="_blank"><img src="${fotoTugas}" style="width:40px; height:40px; object-fit:cover; border-radius:5px; border:1px solid #ccc;"></a>` 
             : '-';
 
           const row = document.createElement('tr');
@@ -209,5 +206,5 @@ function renderTabel(dataAbsen) {
   }
 }
 
-// Panggil data dari Sheets saat pertama kali halaman dimuat
+// Ambil data saat halaman dimuat
 ambilDataGoogleSheets();
