@@ -1,4 +1,4 @@
-const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZlSCNCaXbw/exec';
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbzszunydni3Eae_czspWUJ4NI2DS2c0v_CZglrMl75q_1BuXdSmHj0upnhQoUua6MItBQ/exec';
 
 // Daftar Nama Siswa Kelas IV A
 const daftarSiswa = [
