@@ -65,14 +65,14 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
   const file = fileInput.files[0];
 
   if (file) {
-    // Kompresi Gambar
+    // Fungsi Kompresi Foto
     const reader = new FileReader();
     reader.onload = function(event) {
       const img = new Image();
       img.src = event.target.result;
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400; // Ukuran lebar diturunkan agar hemat memori
+        const MAX_WIDTH = 300; // Ukuran lebar diturunkan agar sangat ringan
         const scaleFactor = MAX_WIDTH / img.width;
         
         canvas.width = MAX_WIDTH;
@@ -81,8 +81,8 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // Kompresi kualitas gambar ke 60%
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        // Kompresi kualitas gambar ke 50%
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
         simpanData(compressedBase64);
       };
     };
@@ -112,9 +112,9 @@ function simpanData(fotoBase64) {
     document.getElementById('fotoTugas').value = '';
 
     renderTabel();
-    alert('Data berhasil disimpan!');
+    alert('✅ Data dan Foto Berhasil Disimpan!');
   } catch (error) {
-    alert('Memori penyimpanan penuh. Coba simpan tanpa foto atau hapus riwayat browser.');
+    alert('⚠️ Penyimpanan browser penuh! Silakan hapus riwayat browser atau gunakan foto yang lebih kecil.');
   }
 }
 
@@ -134,7 +134,7 @@ function renderTabel() {
   dataAbsen.forEach(item => {
     // Tampilan Gambar di Tabel
     const fotoHTML = item.fotoTugas 
-      ? `<a href="${item.fotoTugas}" target="_blank"><img src="${item.fotoTugas}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;"></a>` 
+      ? `<a href="${item.fotoTugas}" target="_blank"><img src="${item.fotoTugas}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #ccc;"></a>` 
       : '-';
 
     const row = document.createElement('tr');
