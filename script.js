@@ -1,4 +1,4 @@
-const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZlSCNCaXbw/exec';
+const URL_SCRIPT = 'https://script.google.com/macros/s/AKfycbxpso6Tp5Gic9VoB5FlLohlC_ddUHsp1TtM-eWzUXupZy-PAchnCmNC9V0qZISCNCaXbw/exec';
 
 // Daftar Nama Siswa Kelas IV A
 const daftarSiswa = [
@@ -83,7 +83,7 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
       img.src = event.target.result;
       img.onload = function() {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 250; // Kompresi ekstra agar sangat ringan
+        const MAX_WIDTH = 250;
         const scaleFactor = MAX_WIDTH / img.width;
         
         canvas.width = MAX_WIDTH;
@@ -92,7 +92,6 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        // Kompresi kualitas gambar ke 40%
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
         kirimKeGoogleSheets(compressedBase64, btnSubmit);
       };
@@ -104,28 +103,33 @@ document.getElementById('absenForm').addEventListener('submit', function(e) {
 });
 
 function kirimKeGoogleSheets(fotoBase64, btnSubmit) {
-  const formData = new FormData();
-  formData.append('tanggal', document.getElementById('tanggal').value);
-  formData.append('nama', selectNama.value);
-  formData.append('kehadiran', document.getElementById('kehadiran').value);
-  formData.append('mapel', document.getElementById('mapel').value || '-');
-  formData.append('statusTugas', document.getElementById('statusTugas').value);
-  formData.append('fotoTugas', fotoBase64);
+  const payload = {
+    tanggal: document.getElementById('tanggal').value,
+    nama: selectNama.value,
+    kehadiran: document.getElementById('kehadiran').value,
+    mapel: document.getElementById('mapel').value || '-',
+    statusTugas: document.getElementById('statusTugas').value,
+    fotoTugas: fotoBase64
+  };
 
   fetch(URL_SCRIPT, {
     method: 'POST',
-    body: formData
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    body: JSON.stringify(payload)
   })
   .then(() => {
-    alert('✅ Data dan Foto Berhasil Terkirim!');
+    alert('✅ Data Berhasil Terkirim!');
     selectNama.value = '';
     document.getElementById('mapel').value = '';
     document.getElementById('fotoTugas').value = '';
     
-    setTimeout(ambilDataGoogleSheets, 2000);
+    setTimeout(ambilDataGoogleSheets, 1500);
   })
   .catch(err => {
-    alert('❌ Gagal mengirim data. Coba cek koneksi internetmu.');
+    alert('❌ Gagal mengirim data.');
   })
   .finally(() => {
     btnSubmit.disabled = false;
@@ -206,5 +210,5 @@ function renderTabel(dataAbsen) {
   }
 }
 
-// Ambil data saat halaman dimuat
+// Muat data saat halaman dibuka
 ambilDataGoogleSheets();
